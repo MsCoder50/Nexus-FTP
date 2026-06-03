@@ -1,11 +1,12 @@
 import ftplib
+import os
 
 def ftp():
   try:
-    ftp_server= "files.000webhost.com"
-    ftp_username= "perfectuselits"
+    ftp_server= os.getenv(SERVER_NAME)
+    ftp_username= os.getenv(USER_NAME)
     
-    ftp_pass = "Hello@me1"
+    ftp_pass = os.getenv(PASS)
     ssl = 0
     filename = r"file.pdf"
     out_dir = "public_html/Report"
