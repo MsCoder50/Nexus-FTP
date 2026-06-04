@@ -3,10 +3,10 @@ import os
 
 def ftp():
   try:
-    ftp_server= os.getenv(SERVER_NAME)
-    ftp_username= os.getenv(USER_NAME)
+    ftp_server= os.getenv('SERVER_NAME')
+    ftp_username= os.getenv('USER_NAME')
     
-    ftp_pass = os.getenv(PASS)
+    ftp_pass = os.getenv('PASS')
     ssl = 0
     filename = r"file.pdf"
     out_dir = "public_html/Report"
