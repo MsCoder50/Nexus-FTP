@@ -19,19 +19,19 @@ Nexus FTP is a robust file transfer solution featuring a Python Flask backend. I
 
 ```mermaid
 sequenceDiagram
-    participant C as Client (React UI / cURL)
+    participant C as Client
     participant B as Flask Backend
-    participant FS as Local Filesystem (tmp/)
+    participant FS as Local Filesystem
     participant S as FTP Server
 
-    C->>B: POST /get-file (File + Credentials)
+    C->>B: POST /get-file
     B->>FS: Save File Temporarily
     FS-->>B: Confirmation
-    B->>S: Connect (Port 21) & Authenticate
+    B->>S: Connect and Authenticate
     S-->>B: Auth Success
-    B->>S: STOR filename (Binary Transfer)
+    B->>S: Upload Binary File
     S-->>B: Transfer Complete
-    B->>C: 200 OK (JSON Response)
+    B->>C: 200 OK Response
 ```
 
 ## 🚀 How to Setup the App
