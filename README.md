@@ -11,22 +11,47 @@ Nexus FTP is a robust file transfer solution featuring a Python Flask backend. I
 ![Screenshot 5](./screenshots/5.png)
 
 ## 💡 Workflow of the App
-1. **Client Request**: The client (or API testing tool) sends a `POST` request to the backend containing the target FTP credentials (`host`, `user`, `password`) and the `file` to be uploaded.
-2. **Local Staging**: The Flask backend receives the file and temporarily saves it in a local `tmp/` directory to ensure data integrity.
-3. **FTP Authentication**: The backend connects to the specified FTP server on port 21 and authenticates the user.
-4. **Binary Transfer**: The backend pipes the saved binary file directly to the FTP server using the `STOR` command in Passive Mode.
-5. **Response**: Upon successful transfer, the backend returns a `200 OK` JSON response and cleans up the connection.
+1. The **Frontend** sends a `POST` request to the backend's `/test-ftp` endpoint with the user's FTP credentials.
+2. The **Backend** attempts to connect to the target FTP server on port 21. 
+3. If the connection and login are successful, it immediately closes the connection and returns a `200 OK`. The frontend then saves these credentials.
+
+### Phase 2: File Upload (`/get-file`)
+1. The **Frontend** sends the selected file along with the saved credentials to the `/get-file` API.
+2. The **Backend** temporarily saves the file to a local `tmp/` directory to ensure data integrity.
+3. The **Backend** initiates a new secure connection to the FTP server and pipes the binary file using the `STOR` command.
+4. Once the transfer completes, the **Backend** deletes the temporary file to clean up the workspace and returns a success response to the Frontend.
 
 ```mermaid
 sequenceDiagram
-    Client->>Backend: POST /get-file
-    Backend->>LocalFilesystem: Save File Temporarily
-    LocalFilesystem-->>Backend: Confirmation
-    Backend->>FTPServer: Connect and Authenticate
+    autonumber
+    participant Frontend
+    participant Backend
+    participant FileSystem
+    participant FTPServer
+
+    Note over Frontend, FTPServer: Phase 1: Credential Verification
+    Frontend->>Backend: POST /test-ftp (FTP Credentials)
+    Backend->>FTPServer: Connect & Authenticate
     FTPServer-->>Backend: Auth Success
-    Backend->>FTPServer: Upload Binary File
+    Backend->>FTPServer: QUIT connection
+    Backend-->>Frontend: 200 OK (Connection Successful)
+
+    Note over Frontend, FTPServer: Phase 2: File Upload Workflow
+    Frontend->>Backend: POST /get-file (File + Credentials)
+    
+    Backend->>FileSystem: Save File to tmp/
+    FileSystem-->>Backend: File Saved
+    
+    Backend->>FTPServer: Connect & Login
+    FTPServer-->>Backend: Authentication Success
+    
+    Backend->>FTPServer: STOR Command (Binary Transfer)
     FTPServer-->>Backend: Transfer Complete
-    Backend->>Client: 200 OK Response
+    
+    Backend->>FileSystem: Delete tmp/ File
+    FileSystem-->>Backend: File Removed
+    
+    Backend-->>Frontend: 200 OK Response
 ```
 
 ## 🚀 How to Setup the App
