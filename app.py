@@ -1,5 +1,5 @@
 from flask import Flask,jsonify,request
-from ftplib import FTP_TLS
+from ftplib import FTP
 import os
 from flask_cors import CORS
 
@@ -17,13 +17,19 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE_MB * 1024 * 1024
 #making directory if not exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-def upload(file_path, SERVER,USERNAME,PASSWORD):
+def upload(file_path, SERVER,USERNAME,PASSWORD, remote_dir=None):
     filename = os.path.basename(file_path)
-    with FTP_TLS(SERVER, USERNAME, PASSWORD) as ftp:
+    with FTP() as ftp:
+        ftp.connect(SERVER, 21, timeout=30)
+        ftp.login(USERNAME, PASSWORD)
+        ftp.set_pasv(True)        # ensure passive mode for data transfers
+
+        if remote_dir:
+            ftp.cwd(remote_dir)
+
         with open(file_path, "rb") as file_object:
             # Use 'STOR' command followed by the target filename on the server
             ftp.storbinary(f"STOR {filename}", file_object)
-
 
 
 #api routes
@@ -51,11 +57,16 @@ def get_file():
 
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filepath)
+    remote_dir = request.form.get("remote_dir")
     
     try:
-        upload(filepath, host, user, password)
+        upload(filepath, host, user, password, remote_dir=remote_dir)
+        if os.path.exists(filepath):
+            os.remove(filepath)
         return jsonify({"message": "File received and uploaded successfully", "file_path": filepath}), 200
     except Exception as e:
+        if os.path.exists(filepath):
+            os.remove(filepath)
         return jsonify({"error": f"FTP upload failed: {str(e)}"}), 500
 
 @app.route("/test-ftp",methods=["POST"])
@@ -63,14 +74,20 @@ def test_ftp():
     host = request.form.get("host")
     user = request.form.get("user")
     password = request.form.get("password")
+    remote_dir = request.form.get("remote_dir")
 
     if not host or not user or not password:
         return jsonify({"error": "FTP credentials missing"}), 400
 
-    ftp = FTP_TLS()
+    ftp = FTP()
     try:
-        ftp.connect(host,21)
-        ftp.login(user,password)
+        ftp.connect(host, 21, timeout=30)
+        ftp.login(user, password)
+        ftp.set_pasv(True)
+
+        if remote_dir:
+            ftp.cwd(remote_dir)
+
         ftp.quit()
         return jsonify({"message": "FTP connection successful"}), 200
     except Exception as e:
