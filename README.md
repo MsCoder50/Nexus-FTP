@@ -75,6 +75,7 @@ cd Frontend
 npm run dev
 ```
 Frontend will be served at localhost:3000
+
 ---
 
 ## ⚠️ Important FTP Server Configuration (e.g., FileZilla Server)
