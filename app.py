@@ -4,7 +4,7 @@ import os
 from flask_cors import CORS
 
 #defining variables
-app = Flask(__name__, static_folder='frontend/dist/assets', template_folder='frontend/dist')
+app = Flask(__name__, static_folder='frontend/dist', template_folder='frontend/dist', static_url_path='')
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'tmp')
 MAX_FILE_SIZE_MB = 1024
 
