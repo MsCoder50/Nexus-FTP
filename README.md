@@ -56,18 +56,32 @@ sequenceDiagram
 
 ## 🚀 How to Setup the App
 
-### 1. Install Dependencies
-Ensure you have Python installed, then install the required backend dependencies:
+### Option A: Local Development
+**1. Start the Backend:**
+Ensure you have Python installed.
 ```bash
 pip install -r requirements.txt
-```
-
-### 2. Run the Backend Server
-Start the Flask API server:
-```bash
 python3 app.py
 ```
-The backend server will run continuously on `http://127.0.0.1:8080`.
+
+**2. Start the Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Option B: Production Docker Deployment (Single Container)
+This repository includes a multi-stage `Dockerfile` that automatically builds the React frontend and configures the Flask backend to serve it natively, allowing you to deploy the entire full-stack app as a single service.
+
+```bash
+# Build the Docker image
+docker build -t nexus-ftp .
+
+# Run the container locally or push to a host like Render
+docker run -p 8080:8080 nexus-ftp
+```
+Your full application will be accessible at `http://127.0.0.1:8080`.
 
 ---
 
