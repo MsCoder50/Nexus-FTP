@@ -33,7 +33,7 @@ function App() {
       formData.append('user', credentials.user);
       formData.append('password', credentials.password);
 
-      const res = await fetch('http://127.0.0.1:8080/test-ftp', {
+      const res = await fetch('/test-ftp', {
         method: 'POST',
         body: formData,
       });
@@ -72,7 +72,7 @@ function App() {
       formData.append('user', credentials.user);
       formData.append('password', credentials.password);
 
-      const res = await fetch('http://127.0.0.1:8080/get-file', {
+      const res = await fetch('/get-file', {
         method: 'POST',
         body: formData,
       });

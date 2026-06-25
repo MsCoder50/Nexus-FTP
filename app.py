@@ -1,11 +1,10 @@
-from flask import Flask,jsonify,request
+from flask import Flask, jsonify, request, render_template
 from ftplib import FTP
 import os
 from flask_cors import CORS
 
-
 #defining variables
-app = Flask(__name__)
+app = Flask(__name__, static_folder='frontend/dist/assets', template_folder='frontend/dist')
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'tmp')
 MAX_FILE_SIZE_MB = 1024
 
@@ -16,6 +15,10 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE_MB * 1024 * 1024
 
 #making directory if not exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 def upload(file_path, SERVER,USERNAME,PASSWORD, remote_dir=None):
     filename = os.path.basename(file_path)
