@@ -4,7 +4,7 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
-RUN npm run build
+RUN CI=false npm run build
 
 # STAGE 2: Setup Python Flask App
 FROM python:3.9-slim
